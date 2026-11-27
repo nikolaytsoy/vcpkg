@@ -23,7 +23,7 @@ Before modifying anything for a PR, locate and read its existing report from `re
 | `pr` | Yes | One or more microsoft/vcpkg PR numbers. |
 | `fixes` | No | Requested changes per PR. If omitted, use agreed findings from the conversation or existing review; ask if the intended scope is unclear. |
 | `reviews-root` | No | Directory containing `pr-<NUMBER>/report.md`; defaults to `reviews/` in the caller's original directory. |
-| `push-remote` | No | Git remote for the user's fork. Use an applicable personal default or ask; do not assume `origin` is the destination. |
+| `push-remote` | No | Git remote for the user's fork. Use an applicable personal default or ask; do not assume `origin` is the destination. If the user has no fork or no push access to it, see "Push access" below. |
 
 Resolve explicit arguments before personal defaults. Personal instructions may supply defaults scoped to microsoft/vcpkg; no particular username, remote name, or machine path is required by this skill.
 
@@ -35,6 +35,15 @@ Before changing directories, resolve `reviews-root` and `.github/skills/shared/r
 - `/fix-reviewed-vcpkg-pr 12345, 12346 push-remote my-fork`
 - `/fix-reviewed-vcpkg-pr 12345 reviews-root D:\review-results\reviews fixes F1,F3`
 - `/fix-reviewed-vcpkg-pr 12345 fixes "Correct the installed include paths" push-remote my-fork`
+
+### Push access
+
+If the user has no fork, no push remote, or a push fails because of missing credentials or permissions, stop and tell the user how to set up push access; do not create forks, tokens, or remotes for them. Suggest a fine-grained token limited to the fork:
+
+1. Fork microsoft/vcpkg on GitHub, if needed.
+2. Create a fine-grained token at https://github.com/settings/personal-access-tokens/new?name=vcpkg-fork&contents=write. Under "Repository access", choose "Only select repositories" and select the fork.
+3. Store the token for git over HTTPS, for example with your git credential helper. In a VM made with the `create-vm` skill, run `C:\vcpkg\scripts\vm\Set-Tokens.ps1` there and skip its other prompts. The token never goes into the chat.
+4. Add the fork as an HTTPS remote, for example `git remote add fork https://github.com/<login>/vcpkg.git`, and pass `push-remote fork`.
 
 ## Workspace and artifact safety
 
